@@ -1,5 +1,5 @@
 import requests, json
-import math
+import math, time
 
 url = "https://api.opensea.io/api/v1/assets"
 
@@ -15,16 +15,30 @@ data = {'assets': []}
 # fetch assets in collection 50 at a time
 while True:
     params = {
-        'collection': 'the-wanderers',
+        'collection': 'azuki',
         'offset': offset,
         'limit': 50
     }
  
-    r = requests.get('https://api.opensea.io/api/v1/assets', headers=headers, params=params)
- #   response = requests.request("GET", url, headers=headers, params=params)
-
+    #r = requests.get('https://api.opensea.io/api/v1/assets', headers=headers, params=params)
+    r = requests.request("GET", url, headers=headers, params=params)
+    
     response = r.json()
+
+    try:
+        (response['assets'])
+    except KeyError:
+        print("offset throws null assets @", offset)
+        print(response)
+        time.sleep(3)
+        r = requests.request("GET", url, headers=headers, params=params)
+        response = r.json()
+       
+
+
+    #print(json.dumps(response['assets']))
     data['assets'].extend(response['assets'])
+
 
     if len(response['assets']) < 50:
         break
